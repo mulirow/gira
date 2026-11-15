@@ -23,6 +23,9 @@ export default async function DashboardPage() {
         <p>
           Você entrou com <strong>{session.user.email}</strong>.
         </p>
+        <Link className="dashboard-resources-link" href="/resources">
+          Explorar recursos <span aria-hidden="true">&rarr;</span>
+        </Link>
       </section>
     </main>
   );
