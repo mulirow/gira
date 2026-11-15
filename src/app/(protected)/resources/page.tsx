@@ -51,6 +51,7 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
         <Link className="wordmark" href="/">gira<span>.</span></Link>
         <nav className="resources-navigation" aria-label="Navegação principal">
           <Link href="/dashboard">Painel</Link>
+          <Link href="/bookings">Agendamentos</Link>
           <SignOutButton />
         </nav>
       </header>
