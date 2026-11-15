@@ -22,6 +22,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  bookings      Booking[]
 }
 
 model Session {
@@ -76,6 +77,29 @@ model Resource {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  bookings    Booking[]
 
   @@index([isActive, name])
+}
+
+enum BookingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Booking {
+  id         String        @id @default(cuid())
+  resourceId String
+  userId     String
+  startsAt   DateTime      @db.Timestamptz(3)
+  endsAt     DateTime      @db.Timestamptz(3)
+  status     BookingStatus @default(PENDING)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  resource   Resource      @relation(fields: [resourceId], references: [id], onDelete: Restrict)
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([resourceId, startsAt, endsAt, status])
+  @@index([userId, createdAt])
 }

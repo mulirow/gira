@@ -15,7 +15,11 @@ export default async function DashboardPage() {
     <main className="dashboard-page">
       <header className="dashboard-header">
         <Link className="wordmark" href="/">gira<span>.</span></Link>
-        <SignOutButton />
+        <nav className="resources-navigation" aria-label="Navegação principal">
+          <Link href="/resources">Recursos</Link>
+          <Link href="/bookings">Agendamentos</Link>
+          <SignOutButton />
+        </nav>
       </header>
       <section className="dashboard-content">
         <p className="eyebrow">Acesso confirmado</p>
