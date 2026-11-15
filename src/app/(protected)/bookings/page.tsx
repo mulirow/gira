@@ -118,7 +118,7 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
                     {booking.startsAt.toLocaleString("pt-BR")} – {booking.endsAt.toLocaleString("pt-BR")}
                   </p>
                   <span className={`booking-state is-${booking.status.toLowerCase()}`}>
-                    {booking.status === "PENDING" ? "Pendente" : booking.status === "APPROVED" ? "Aprovada" : "Recusada"}
+                    {booking.status === "PENDING" ? "Pendente" : booking.status === "APPROVED" ? "Aprovada" : booking.status === "REJECTED" ? "Recusada" : "Cancelada"}
                   </span>
                 </li>
               ))}
