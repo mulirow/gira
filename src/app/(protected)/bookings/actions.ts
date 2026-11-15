@@ -5,6 +5,32 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+export async function cancelBooking(formData: FormData) {
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  if (!session) {
+    redirect("/login");
+  }
+
+  const bookingId = formData.get("bookingId");
+
+  if (typeof bookingId !== "string" || bookingId.length === 0) {
+    redirect("/dashboard?result=cancel-unavailable");
+  }
+
+  const result = await prisma.booking.updateMany({
+    where: {
+      id: bookingId,
+      userId: session.user.id,
+      startsAt: { gt: new Date() },
+      status: { in: ["PENDING", "APPROVED"] },
+    },
+    data: { status: "CANCELED" },
+  });
+
+  redirect(`/dashboard?result=${result.count === 1 ? "canceled" : "cancel-unavailable"}`);
+}
+
 export async function requestBooking(formData: FormData) {
   const session = await auth.api.getSession({ headers: await headers() });
 

@@ -932,6 +932,48 @@ a {
   background: #f4e7df;
 }
 
+.booking-state.is-canceled {
+  color: #4b5651;
+  background: #e5e9e5;
+}
+
+.booking-cancel-button {
+  padding: 7px 10px;
+  border: 1px solid #a34a37;
+  border-radius: 2px;
+  color: #873d2d;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.booking-cancel-button:hover {
+  color: #fff;
+  background: #873d2d;
+}
+
+.dashboard-booking-sections {
+  margin-top: 40px;
+}
+
+.dashboard-content:has(.dashboard-booking-sections) {
+  max-width: 860px;
+}
+
+.dashboard-content .booking-list li {
+  grid-template-columns: minmax(130px, 1fr) minmax(180px, 1.25fr) auto auto;
+}
+
+.dashboard-content .booking-feedback {
+  margin-top: 28px;
+}
+
+.dashboard-bookings-empty {
+  margin-top: 28px;
+}
+
 .resource-location-groups {
   display: grid;
   gap: 32px;
