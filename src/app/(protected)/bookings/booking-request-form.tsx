@@ -37,9 +37,10 @@ export default function BookingRequestForm({ resources }: BookingRequestFormProp
 
   return (
     <form className="booking-form" action={requestBooking}>
-      <label>
+      <label htmlFor="booking-location">
         Local
         <select
+          id="booking-location"
           required
           value={selectedLocation}
           onChange={(event) => {
@@ -53,9 +54,10 @@ export default function BookingRequestForm({ resources }: BookingRequestFormProp
           ))}
         </select>
       </label>
-      <label>
+      <label htmlFor="booking-resource">
         Recurso
         <select
+          id="booking-resource"
           name="resourceId"
           required
           disabled={!selectedLocation}
