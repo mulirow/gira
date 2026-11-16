@@ -21,7 +21,7 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
   const selectedStatus = ["active", "inactive"].includes(params.status ?? "")
     ? params.status
     : "all";
-  const [allResources, locations] = await Promise.all([
+  const [allResources, locations, managerAssignment] = await Promise.all([
     prisma.resource.findMany({
       where: {
         ...(selectedLocation !== "all" ? { location: selectedLocation } : {}),
@@ -34,6 +34,10 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
       distinct: ["location"],
       select: { location: true },
       orderBy: { location: "asc" },
+    }),
+    prisma.spaceManager.findFirst({
+      where: { managerId: session.user.id },
+      select: { spaceId: true },
     }),
   ]);
 
@@ -52,6 +56,7 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
         <nav className="resources-navigation" aria-label="Navegação principal">
           <Link href="/dashboard">Painel</Link>
           <Link href="/bookings">Agendamentos</Link>
+          {managerAssignment && <Link href="/review">Analisar solicitações</Link>}
           <SignOutButton />
         </nav>
       </header>

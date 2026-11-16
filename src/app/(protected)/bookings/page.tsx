@@ -37,7 +37,7 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
     redirect("/login");
   }
 
-  const [resources, bookings, params] = await Promise.all([
+  const [resources, bookings, managerAssignment, params] = await Promise.all([
     prisma.resource.findMany({
       select: { id: true, name: true, location: true, isActive: true },
       orderBy: [{ location: "asc" }, { name: "asc" }],
@@ -47,6 +47,10 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
       include: { resource: { select: { name: true, location: true } } },
       orderBy: { startsAt: "desc" },
       take: 20,
+    }),
+    prisma.spaceManager.findFirst({
+      where: { managerId: session.user.id },
+      select: { spaceId: true },
     }),
     searchParams,
   ]);
@@ -60,6 +64,7 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
         <nav className="resources-navigation" aria-label="Navegação principal">
           <Link href="/dashboard">Painel</Link>
           <Link href="/resources">Recursos</Link>
+          {managerAssignment && <Link href="/review">Analisar solicitações</Link>}
           <SignOutButton />
         </nav>
       </header>
@@ -120,6 +125,9 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
                   <span className={`booking-state is-${booking.status.toLowerCase()}`}>
                     {booking.status === "PENDING" ? "Pendente" : booking.status === "APPROVED" ? "Aprovada" : booking.status === "REJECTED" ? "Recusada" : "Cancelada"}
                   </span>
+                  {booking.status === "REJECTED" && booking.rejectionReason && (
+                    <p className="booking-rejection-reason">Motivo: {booking.rejectionReason}</p>
+                  )}
                 </li>
               ))}
             </ul>

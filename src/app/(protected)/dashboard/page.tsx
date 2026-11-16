@@ -24,11 +24,15 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     redirect("/login");
   }
 
-  const [bookings, params] = await Promise.all([
+  const [bookings, managerAssignment, params] = await Promise.all([
     prisma.booking.findMany({
       where: { userId: session.user.id },
       include: { resource: { select: { name: true, location: true } } },
       orderBy: { startsAt: "asc" },
+    }),
+    prisma.spaceManager.findFirst({
+      where: { managerId: session.user.id },
+      select: { spaceId: true },
     }),
     searchParams,
   ]);
@@ -58,6 +62,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <span className={`booking-state is-${booking.status.toLowerCase()}`}>
           {statusLabels[booking.status]}
         </span>
+        {booking.status === "REJECTED" && booking.rejectionReason && (
+          <p className="booking-rejection-reason">Motivo: {booking.rejectionReason}</p>
+        )}
         {canCancel && (
           <form action={cancelBooking}>
             <input type="hidden" name="bookingId" value={booking.id} />
@@ -75,6 +82,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <nav className="resources-navigation" aria-label="Navegação principal">
           <Link href="/resources">Recursos</Link>
           <Link href="/bookings">Agendamentos</Link>
+          {managerAssignment && <Link href="/review">Analisar solicitações</Link>}
           <SignOutButton />
         </nav>
       </header>
