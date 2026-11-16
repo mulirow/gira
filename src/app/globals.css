@@ -864,6 +864,302 @@ a {
   margin: 58px auto 0;
 }
 
+.admin-spaces-workspace {
+  max-width: 1000px;
+  margin: 58px auto 0;
+}
+
+.admin-feedback {
+  margin: 0 0 22px;
+  padding: 12px 14px;
+  border-left: 3px solid #28613d;
+  color: #193d27;
+  background: #e4f2e6;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.admin-feedback.is-error {
+  border-color: #963b2b;
+  color: #60271d;
+  background: #fbe8e2;
+}
+
+.admin-create-space,
+.admin-edit-space,
+.admin-search-form {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-create-space {
+  margin-bottom: 30px;
+  padding: 18px 0;
+  border-top: 1px solid #d7ded6;
+  border-bottom: 1px solid #d7ded6;
+}
+
+.admin-create-space label,
+.admin-edit-space label,
+.admin-search-form label {
+  color: #36514d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-create-space > div,
+.admin-edit-space > div,
+.admin-search-form > div {
+  display: flex;
+  gap: 10px;
+}
+
+.admin-create-space input,
+.admin-edit-space input,
+.admin-search-form input {
+  min-width: 0;
+  min-height: 42px;
+  flex: 1;
+  padding: 0 11px;
+  border: 1px solid #b8c5b8;
+  border-radius: 2px;
+  color: #183b35;
+  background: #fbfcf8;
+  font: inherit;
+  font-size: 14px;
+}
+
+.admin-create-space button,
+.admin-edit-space button,
+.admin-search-form button,
+.admin-manager-list button,
+.admin-candidate-list button,
+.admin-archive-space button,
+.admin-restore-button {
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--pine);
+  border-radius: 2px;
+  color: #fff;
+  background: var(--pine);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.admin-create-space button:hover,
+.admin-edit-space button:hover,
+.admin-search-form button:hover,
+.admin-candidate-list button:hover,
+.admin-restore-button:hover {
+  background: #28564d;
+}
+
+.admin-space-layout {
+  display: grid;
+  grid-template-columns: minmax(210px, 0.72fr) minmax(0, 1.7fr);
+  align-items: start;
+  gap: 36px;
+}
+
+.admin-space-list h2,
+.admin-section-heading h3,
+.admin-manager-search h3 {
+  margin: 0;
+  color: var(--pine);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.admin-space-list > ul,
+.admin-manager-list,
+.admin-candidate-list {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-space-list > ul {
+  border-top: 1px solid #d7ded6;
+}
+
+.admin-space-list > ul > li {
+  border-bottom: 1px solid #d7ded6;
+}
+
+.admin-space-list a {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 10px;
+  color: var(--pine);
+  text-decoration: none;
+}
+
+.admin-space-list a:hover,
+.admin-space-list a.is-selected {
+  background: #e5ebe3;
+}
+
+.admin-space-list a.is-archived {
+  color: #63706b;
+}
+
+.admin-space-list small {
+  flex: 0 0 auto;
+  color: #526660;
+  font-size: 11px;
+}
+
+.admin-space-detail {
+  min-width: 0;
+  padding-top: 3px;
+}
+
+.admin-space-title,
+.admin-section-heading,
+.admin-manager-list li,
+.admin-candidate-list li,
+.admin-manager-list li > div,
+.admin-candidate-list li > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.admin-space-title {
+  align-items: end;
+  margin-bottom: 24px;
+}
+
+.admin-space-title .eyebrow {
+  margin-bottom: 5px;
+  color: #49624e;
+}
+
+.admin-space-title h2 {
+  margin: 0;
+  color: var(--pine);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 30px;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
+.admin-edit-space {
+  padding-bottom: 22px;
+  border-bottom: 1px solid #d7ded6;
+}
+
+.admin-manager-section,
+.admin-manager-search {
+  padding: 22px 0;
+  border-bottom: 1px solid #d7ded6;
+}
+
+.admin-section-heading span {
+  color: #526660;
+  font-size: 12px;
+}
+
+.admin-manager-list li,
+.admin-candidate-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid #e1e6df;
+}
+
+.admin-manager-list li > div,
+.admin-candidate-list li > div {
+  min-width: 0;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.admin-manager-list strong,
+.admin-candidate-list strong {
+  color: #183b35;
+  font-size: 13px;
+}
+
+.admin-manager-list span,
+.admin-candidate-list span {
+  color: #526660;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.admin-manager-list button {
+  min-height: 36px;
+  border-color: #a34a37;
+  color: #873d2d;
+  background: transparent;
+}
+
+.admin-manager-list button:hover {
+  color: #fff;
+  background: #873d2d;
+}
+
+.admin-manager-search > h3 {
+  margin-bottom: 14px;
+}
+
+.admin-empty,
+.admin-space-list > p {
+  color: #526660;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.admin-archive-space {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid #d7ded6;
+}
+
+.admin-archive-space summary {
+  width: fit-content;
+  color: #873d2d;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.admin-archive-space p {
+  max-width: 600px;
+  color: #526660;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.admin-archive-space button {
+  border-color: #963b2b;
+  background: #963b2b;
+}
+
+.admin-archive-space button:hover {
+  background: #762f23;
+}
+
+.admin-restore-button {
+  border-color: #28613d;
+  background: #28613d;
+}
+
+.admin-spaces-page button:focus-visible,
+.admin-spaces-page input:focus-visible,
+.admin-archive-space summary:focus-visible,
+.admin-space-list a:focus-visible {
+  outline: 3px solid #1f5fbf;
+  outline-offset: 2px;
+}
+
 .review-workspace .booking-feedback {
   margin-bottom: 24px;
 }
@@ -1344,6 +1640,38 @@ a {
 
   .dashboard-page {
     padding: 24px;
+  }
+
+  .admin-spaces-workspace {
+    margin-top: 42px;
+  }
+
+  .admin-space-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .admin-space-title {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .admin-space-title h2 {
+    font-size: 27px;
+  }
+
+  .admin-create-space > div,
+  .admin-edit-space > div,
+  .admin-search-form > div {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-create-space button,
+  .admin-edit-space button,
+  .admin-search-form button {
+    width: 100%;
   }
 
   .dashboard-content {
