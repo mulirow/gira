@@ -118,7 +118,7 @@ export async function requestBooking(formData: FormData) {
   }
 
   const resource = await prisma.resource.findFirst({
-    where: { id: resourceId, isActive: true },
+    where: { id: resourceId, isActive: true, space: { isActive: true } },
     select: { id: true },
   });
 

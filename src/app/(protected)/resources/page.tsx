@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import SignOutButton from "@/components/sign-out-button";
 import { auth } from "@/lib/auth";
+import { isAdminUser } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 
 type ResourcesPageProps = {
@@ -21,9 +22,10 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
   const selectedStatus = ["active", "inactive"].includes(params.status ?? "")
     ? params.status
     : "all";
-  const [allResources, locations, managerAssignment] = await Promise.all([
+  const [allResources, locations, managerAssignment, isAdmin] = await Promise.all([
     prisma.resource.findMany({
       where: {
+        space: { isActive: true },
         ...(selectedLocation !== "all" ? { location: selectedLocation } : {}),
         ...(selectedStatus === "active" ? { isActive: true } : {}),
         ...(selectedStatus === "inactive" ? { isActive: false } : {}),
@@ -31,6 +33,7 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
       orderBy: [{ location: "asc" }, { name: "asc" }],
     }),
     prisma.resource.findMany({
+      where: { space: { isActive: true } },
       distinct: ["location"],
       select: { location: true },
       orderBy: { location: "asc" },
@@ -39,6 +42,7 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
       where: { managerId: session.user.id },
       select: { spaceId: true },
     }),
+    isAdminUser(session.user.id),
   ]);
 
   const resourcesByLocation = new Map<string, typeof allResources>();
@@ -57,6 +61,7 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
           <Link href="/dashboard">Painel</Link>
           <Link href="/bookings">Agendamentos</Link>
           {managerAssignment && <Link href="/review">Analisar solicitações</Link>}
+          {isAdmin && <Link href="/admin/spaces">Gerenciar espaços</Link>}
           <SignOutButton />
         </nav>
       </header>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import SignOutButton from "@/components/sign-out-button";
 import { auth } from "@/lib/auth";
+import { isAdminUser } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 import BookingRequestForm from "./booking-request-form";
 
@@ -37,8 +38,9 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
     redirect("/login");
   }
 
-  const [resources, bookings, managerAssignment, params] = await Promise.all([
+  const [resources, bookings, managerAssignment, isAdmin, params] = await Promise.all([
     prisma.resource.findMany({
+      where: { space: { isActive: true } },
       select: { id: true, name: true, location: true, isActive: true },
       orderBy: [{ location: "asc" }, { name: "asc" }],
     }),
@@ -52,6 +54,7 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
       where: { managerId: session.user.id },
       select: { spaceId: true },
     }),
+    isAdminUser(session.user.id),
     searchParams,
   ]);
 
@@ -65,6 +68,7 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
           <Link href="/dashboard">Painel</Link>
           <Link href="/resources">Recursos</Link>
           {managerAssignment && <Link href="/review">Analisar solicitações</Link>}
+          {isAdmin && <Link href="/admin/spaces">Gerenciar espaços</Link>}
           <SignOutButton />
         </nav>
       </header>

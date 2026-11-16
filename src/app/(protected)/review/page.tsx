@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import SignOutButton from "@/components/sign-out-button";
 import { auth } from "@/lib/auth";
+import { isAdminUser } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 import { approveBooking, rejectBooking } from "../bookings/actions";
 
@@ -38,10 +39,13 @@ export default async function ReviewPage({ searchParams }: ReviewPageProps) {
     redirect("/login");
   }
 
-  const managerAssignment = await prisma.spaceManager.findFirst({
-    where: { managerId: session.user.id },
-    select: { spaceId: true },
-  });
+  const [managerAssignment, isAdmin] = await Promise.all([
+    prisma.spaceManager.findFirst({
+      where: { managerId: session.user.id },
+      select: { spaceId: true },
+    }),
+    isAdminUser(session.user.id),
+  ]);
 
   if (!managerAssignment) {
     redirect("/dashboard");
@@ -73,6 +77,7 @@ export default async function ReviewPage({ searchParams }: ReviewPageProps) {
           <Link href="/dashboard">Painel</Link>
           <Link href="/resources">Recursos</Link>
           <Link href="/bookings">Agendamentos</Link>
+          {isAdmin && <Link href="/admin/spaces">Gerenciar espaços</Link>}
           <SignOutButton />
         </nav>
       </header>
