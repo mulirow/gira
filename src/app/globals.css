@@ -859,6 +859,162 @@ a {
   margin-top: 38px;
 }
 
+.review-workspace {
+  max-width: 900px;
+  margin: 58px auto 0;
+}
+
+.review-workspace .booking-feedback {
+  margin-bottom: 24px;
+}
+
+.review-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.review-item {
+  padding: 24px 0;
+  border-bottom: 1px solid #d7ded6;
+}
+
+.review-item-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.review-item-heading h2 {
+  margin: 0;
+  color: var(--pine);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 25px;
+  font-weight: 400;
+}
+
+.review-resource-location {
+  margin: 0 0 5px;
+  color: #526660;
+  font-size: 12px;
+}
+
+.review-details {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 1.4fr);
+  gap: 16px 24px;
+  margin: 20px 0;
+}
+
+.review-details dt,
+.review-reject label {
+  margin-bottom: 5px;
+  color: #526660;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.review-details dd {
+  margin: 0;
+  color: #183b35;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.review-details dd span {
+  color: #526660;
+}
+
+.review-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.review-actions button,
+.review-reject summary {
+  min-height: 40px;
+  padding: 0 15px;
+  border: 1px solid;
+  border-radius: 2px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.review-approve-button {
+  border-color: #28613d !important;
+  color: #fff;
+  background: #28613d;
+}
+
+.review-approve-button:hover {
+  background: #1d4b2f;
+}
+
+.review-reject summary {
+  display: flex;
+  align-items: center;
+  border-color: #963b2b;
+  color: #823d2c;
+  background: transparent;
+  list-style: none;
+}
+
+.review-reject summary::-webkit-details-marker {
+  display: none;
+}
+
+.review-reject summary:hover {
+  color: #fff;
+  background: #823d2c;
+}
+
+.review-reject form {
+  display: grid;
+  width: min(440px, calc(100vw - 56px));
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.review-reject label {
+  display: block;
+}
+
+.review-reject textarea {
+  width: 100%;
+  min-height: 84px;
+  padding: 10px;
+  border: 1px solid #b8c5b8;
+  border-radius: 2px;
+  color: #183b35;
+  background: #fbfcf8;
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+
+.review-reject textarea:focus-visible,
+.review-reject summary:focus-visible,
+.review-actions button:focus-visible {
+  outline: 3px solid #1f5fbf;
+  outline-offset: 2px;
+}
+
+.review-reject-button {
+  justify-self: start;
+  border-color: #963b2b !important;
+  color: #fff;
+  background: #963b2b;
+}
+
+.review-reject-button:hover {
+  background: #762f23;
+}
+
 .booking-history-heading {
   display: flex;
   align-items: baseline;
@@ -935,6 +1091,14 @@ a {
 .booking-state.is-canceled {
   color: #4b5651;
   background: #e5e9e5;
+}
+
+.booking-rejection-reason {
+  grid-column: 1 / -1;
+  margin: -8px 0 0 !important;
+  color: #71483b !important;
+  font-size: 13px !important;
+  line-height: 1.5;
 }
 
 .booking-cancel-button {
@@ -1215,6 +1379,8 @@ a {
   }
 
   .resources-navigation {
+    flex-wrap: wrap;
+    justify-content: flex-end;
     gap: 14px;
   }
 
@@ -1237,6 +1403,15 @@ a {
   .booking-list li {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 10px 14px;
+  }
+
+  .review-workspace {
+    margin-top: 42px;
+  }
+
+  .review-details {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
   }
 
   .availability-calendar {

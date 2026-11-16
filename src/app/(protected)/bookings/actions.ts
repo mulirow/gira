@@ -31,6 +31,60 @@ export async function cancelBooking(formData: FormData) {
   redirect(`/dashboard?result=${result.count === 1 ? "canceled" : "cancel-unavailable"}`);
 }
 
+export async function approveBooking(formData: FormData) {
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  if (!session) {
+    redirect("/login");
+  }
+
+  const bookingId = formData.get("bookingId");
+  if (typeof bookingId !== "string" || bookingId.length === 0) {
+    redirect("/review?result=unavailable");
+  }
+
+  const result = await prisma.booking.updateMany({
+    where: {
+      id: bookingId,
+      status: "PENDING",
+      resource: { space: { managerAssignments: { some: { managerId: session.user.id } } } },
+    },
+    data: { status: "APPROVED" },
+  });
+
+  redirect(`/review?result=${result.count === 1 ? "approved" : "unavailable"}`);
+}
+
+export async function rejectBooking(formData: FormData) {
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  if (!session) {
+    redirect("/login");
+  }
+
+  const bookingId = formData.get("bookingId");
+  const reasonValue = formData.get("reason");
+  const reason = typeof reasonValue === "string" ? reasonValue.trim() : "";
+
+  if (typeof bookingId !== "string" || bookingId.length === 0) {
+    redirect("/review?result=unavailable");
+  }
+  if (reason.length === 0 || reason.length > 300) {
+    redirect("/review?result=invalid");
+  }
+
+  const result = await prisma.booking.updateMany({
+    where: {
+      id: bookingId,
+      status: "PENDING",
+      resource: { space: { managerAssignments: { some: { managerId: session.user.id } } } },
+    },
+    data: { status: "REJECTED", rejectionReason: reason },
+  });
+
+  redirect(`/review?result=${result.count === 1 ? "rejected" : "unavailable"}`);
+}
+
 export async function requestBooking(formData: FormData) {
   const session = await auth.api.getSession({ headers: await headers() });
 
