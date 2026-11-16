@@ -13,16 +13,17 @@ datasource db {
 }
 
 model User {
-  id            String    @id
+  id            String         @id
   name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false)
+  email         String         @unique
+  emailVerified Boolean        @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   sessions      Session[]
   accounts      Account[]
   bookings      Booking[]
+  managedSpaces SpaceManager[]
 }
 
 model Session {
@@ -70,16 +71,38 @@ model Verification {
 }
 
 model Resource {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
   description String
   location    String
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   bookings    Booking[]
+  space       Space     @relation(fields: [location], references: [name], onDelete: Restrict, onUpdate: Cascade)
 
   @@index([isActive, name])
+  @@index([location])
+}
+
+model Space {
+  id                 String         @id @default(cuid())
+  name               String         @unique
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  resources          Resource[]
+  managerAssignments SpaceManager[]
+}
+
+model SpaceManager {
+  spaceId    String
+  managerId  String
+  assignedAt DateTime @default(now())
+  space      Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  manager    User     @relation(fields: [managerId], references: [id], onDelete: Cascade)
+
+  @@id([spaceId, managerId])
+  @@index([managerId])
 }
 
 enum BookingStatus {
@@ -90,16 +113,17 @@ enum BookingStatus {
 }
 
 model Booking {
-  id         String        @id @default(cuid())
-  resourceId String
-  userId     String
-  startsAt   DateTime      @db.Timestamptz(3)
-  endsAt     DateTime      @db.Timestamptz(3)
-  status     BookingStatus @default(PENDING)
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
-  resource   Resource      @relation(fields: [resourceId], references: [id], onDelete: Restrict)
-  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id              String        @id @default(cuid())
+  resourceId      String
+  userId          String
+  startsAt        DateTime      @db.Timestamptz(3)
+  endsAt          DateTime      @db.Timestamptz(3)
+  status          BookingStatus @default(PENDING)
+  rejectionReason String?       @db.VarChar(300)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  resource        Resource      @relation(fields: [resourceId], references: [id], onDelete: Restrict)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([resourceId, startsAt, endsAt, status])
   @@index([userId, createdAt])
