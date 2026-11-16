@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { isAdminUser } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 import SignOutButton from "@/components/sign-out-button";
 import { cancelBooking } from "../bookings/actions";
@@ -24,7 +25,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     redirect("/login");
   }
 
-  const [bookings, managerAssignment, params] = await Promise.all([
+  const [bookings, managerAssignment, isAdmin, params] = await Promise.all([
     prisma.booking.findMany({
       where: { userId: session.user.id },
       include: { resource: { select: { name: true, location: true } } },
@@ -34,6 +35,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       where: { managerId: session.user.id },
       select: { spaceId: true },
     }),
+    isAdminUser(session.user.id),
     searchParams,
   ]);
   const now = new Date();
@@ -83,6 +85,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <Link href="/resources">Recursos</Link>
           <Link href="/bookings">Agendamentos</Link>
           {managerAssignment && <Link href="/review">Analisar solicitações</Link>}
+          {isAdmin && <Link href="/admin/spaces">Gerenciar espaços</Link>}
           <SignOutButton />
         </nav>
       </header>
