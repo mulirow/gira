@@ -933,8 +933,21 @@ a {
 .admin-edit-space button,
 .admin-search-form button,
 .admin-manager-list button,
-.admin-candidate-list button,
+.admin-candidate-list button {
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--pine);
+  border-radius: 2px;
+  color: #fff;
+  background: var(--pine);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+}
+
 .admin-archive-space button,
+.admin-delete-space button,
 .admin-restore-button {
   min-height: 42px;
   padding: 0 14px;
@@ -951,9 +964,13 @@ a {
 .admin-create-space button:hover,
 .admin-edit-space button:hover,
 .admin-search-form button:hover,
-.admin-candidate-list button:hover,
-.admin-restore-button:hover {
+.admin-candidate-list button:hover {
   background: #28564d;
+}
+
+.admin-restore-button {
+  border-color: #28613d;
+  background: #28613d;
 }
 
 .admin-space-layout {
@@ -1117,13 +1134,15 @@ a {
   line-height: 1.5;
 }
 
-.admin-archive-space {
+.admin-archive-space,
+.admin-delete-space {
   margin-top: 24px;
   padding-top: 18px;
   border-top: 1px solid #d7ded6;
 }
 
-.admin-archive-space summary {
+.admin-archive-space summary,
+.admin-delete-space summary {
   width: fit-content;
   color: #873d2d;
   cursor: pointer;
@@ -1131,30 +1150,29 @@ a {
   font-weight: 700;
 }
 
-.admin-archive-space p {
+.admin-archive-space p,
+.admin-delete-space p {
   max-width: 600px;
   color: #526660;
   font-size: 13px;
   line-height: 1.55;
 }
 
-.admin-archive-space button {
+.admin-archive-space button,
+.admin-delete-space button {
   border-color: #963b2b;
   background: #963b2b;
 }
 
-.admin-archive-space button:hover {
+.admin-archive-space button:hover,
+.admin-delete-space button:hover {
   background: #762f23;
-}
-
-.admin-restore-button {
-  border-color: #28613d;
-  background: #28613d;
 }
 
 .admin-spaces-page button:focus-visible,
 .admin-spaces-page input:focus-visible,
 .admin-archive-space summary:focus-visible,
+.admin-delete-space summary:focus-visible,
 .admin-space-list a:focus-visible {
   outline: 3px solid #1f5fbf;
   outline-offset: 2px;
@@ -1468,14 +1486,110 @@ a {
   font-weight: 700;
 }
 
-.resource-status.is-active {
+.resource-status.is-available {
   color: #275638;
   background: #e2eee2;
 }
 
-.resource-status.is-inactive {
-  color: #71483b;
-  background: #f4e7df;
+.resource-status.is-in-maintenance {
+  color: #73500e;
+  background: #fff0c2;
+}
+
+.resource-status.is-broken {
+  color: #762f24;
+  background: #f8ddd6;
+}
+
+.resource-action-feedback {
+  margin: 0 0 20px;
+  padding: 12px 14px;
+  border-left: 3px solid #28613d;
+  color: #193d27;
+  background: #e4f2e6;
+  font-size: 14px;
+}
+
+.resource-manager-tools {
+  margin: 0 0 28px;
+  padding: 20px 0;
+  border-top: 1px solid #d7ded6;
+  border-bottom: 1px solid #d7ded6;
+}
+
+.resource-manager-tools h2,
+.resource-manager-tools h3 {
+  margin: 0 0 16px;
+  color: var(--pine);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.resource-manager-tools h3 {
+  font-size: 22px;
+}
+
+.resource-create-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: 14px;
+}
+
+.resource-create-form label,
+.resource-edit-form label,
+.resource-status-form label {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+  color: #36514d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.resource-create-form input,
+.resource-create-form select,
+.resource-create-form textarea,
+.resource-edit-form input,
+.resource-edit-form textarea,
+.resource-status-form select {
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 11px;
+  border: 1px solid #b8c5b8;
+  border-radius: 2px;
+  color: #183b35;
+  background: #fbfcf8;
+  font: inherit;
+  font-size: 14px;
+}
+
+.resource-create-form textarea {
+  min-height: 42px;
+  resize: vertical;
+}
+
+.resource-create-form button,
+.resource-edit-form button,
+.resource-status-form button {
+  min-height: 42px;
+  justify-self: start;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 2px;
+  color: #fbfcf8;
+  background: var(--pine);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.resource-create-form button:hover,
+.resource-edit-form button:hover,
+.resource-status-form button:hover {
+  background: #28564d;
 }
 
 .resource-catalog {
@@ -1511,6 +1625,31 @@ a {
   font-size: 13px;
 }
 
+.resource-catalog-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.resource-manage-link {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 15px;
+  border: 1px solid var(--pine);
+  border-radius: 2px;
+  color: #fff;
+  background: var(--pine);
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.resource-manage-link:hover {
+  background: #28564d;
+}
+
 .resource-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1532,9 +1671,9 @@ a {
   background: #fff;
 }
 
-.resource-item:has(.resource-status.is-inactive) article {
-  border-top-color: #b8c5b8;
-  background: #f8f9f6;
+.resource-item article.is-operationally-unavailable {
+  border-top-color: #b84d38;
+  background: #fff8f4;
 }
 
 .resource-item h3,
@@ -1552,6 +1691,223 @@ a {
   color: #465d58;
   font-size: 14px;
   line-height: 1.6;
+}
+
+.resource-condition-warning {
+  margin: -10px 0 18px;
+  color: #762f24;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.resource-status-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid #e1e6df;
+}
+
+.resource-status-form button {
+  min-height: 40px;
+}
+
+.resource-delete-control {
+  grid-column: 1 / -1;
+  padding-top: 12px;
+  border-top: 1px solid #e1e6df;
+}
+
+.resource-delete-control summary {
+  width: fit-content;
+  color: #873d2d;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.resource-delete-control p {
+  margin: 8px 0;
+  color: #526660;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.resource-delete-control button {
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid #963b2b;
+  border-radius: 2px;
+  color: #fff;
+  background: #963b2b;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.resource-delete-control button:hover {
+  background: #762f23;
+}
+
+.resource-delete-control summary:focus-visible,
+.resource-delete-control button:focus-visible,
+.admin-delete-space summary:focus-visible,
+.admin-delete-space button:focus-visible {
+  outline: 3px solid #1f5fbf;
+  outline-offset: 2px;
+}
+
+.resource-editable-details {
+  min-width: 0;
+  flex: 1;
+}
+
+.resource-edit-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.resource-edit-icon-button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #b8c5b8;
+  border-radius: 2px;
+  color: var(--pine);
+  background: #fff;
+  cursor: pointer;
+  font: inherit;
+}
+
+.resource-edit-icon-button span {
+  font-size: 19px;
+  line-height: 1;
+}
+
+.resource-edit-icon-button:hover {
+  background: #e8eee6;
+}
+
+.resource-edit-cancel {
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid #b8c5b8;
+  border-radius: 2px;
+  color: var(--pine);
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.resource-edit-cancel:hover {
+  background: #e8eee6;
+}
+
+.resource-edit-form[hidden] {
+  display: none;
+}
+
+.resource-edit-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.resource-edit-form textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.resource-edit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.resource-edit-actions button {
+  min-height: 40px;
+}
+
+.resource-edit-actions .resource-edit-cancel {
+  justify-self: start;
+  border: 1px solid #b8c5b8;
+  color: var(--pine);
+  background: transparent;
+}
+
+.resource-edit-actions .resource-edit-cancel:hover {
+  background: #e8eee6;
+}
+
+.resource-edit-icon-button:focus-visible,
+.resource-edit-actions button:focus-visible,
+.resource-manage-link:focus-visible {
+  outline: 3px solid #1f5fbf;
+  outline-offset: 2px;
+}
+
+.resource-manage-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.resource-manage-list > li {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid #d7ded6;
+  border-left: 3px solid #e78361;
+  background: #fff;
+}
+
+.resource-manage-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.resource-manage-heading h3 {
+  margin: 0;
+  color: var(--pine);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 21px;
+  font-weight: 400;
+}
+
+.resource-editable-details > p {
+  margin: 6px 0 0;
+  color: #465d58;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.resource-manage-controls {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.75fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #e1e6df;
+}
+
+.resource-manage-controls .resource-status-form {
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
 .resource-empty {
@@ -1702,6 +2058,31 @@ a {
     width: 100%;
   }
 
+  .resource-create-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .resource-create-form button {
+    width: 100%;
+  }
+
+  .resource-status-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .resource-manage-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .resource-manage-heading {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .resource-status-form button {
+    width: 100%;
+  }
+
   .resource-filters button {
     flex: 1;
   }
@@ -1792,6 +2173,12 @@ a {
     align-items: start;
     flex-direction: column;
     gap: 8px;
+  }
+
+  .resource-catalog-actions {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
   }
 
   .resource-catalog-heading h2 {
