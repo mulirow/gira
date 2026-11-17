@@ -21,10 +21,13 @@ export async function GET(
 
   const resource = await prisma.resource.findUnique({
     where: { id: resourceId },
-    select: { isActive: true, space: { select: { isActive: true } } },
+    select: {
+      operationalStatus: true,
+      space: { select: { isActive: true } },
+    },
   });
 
-  if (!resource || !resource.isActive || !resource.space.isActive) {
+  if (!resource || resource.operationalStatus !== "AVAILABLE" || !resource.space.isActive) {
     return Response.json({ error: "Recurso indisponível." }, { status: 404 });
   }
 

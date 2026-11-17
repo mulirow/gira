@@ -41,7 +41,7 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
   const [resources, bookings, managerAssignment, isAdmin, params] = await Promise.all([
     prisma.resource.findMany({
       where: { space: { isActive: true } },
-      select: { id: true, name: true, location: true, isActive: true },
+      select: { id: true, name: true, location: true, operationalStatus: true },
       orderBy: [{ location: "asc" }, { name: "asc" }],
     }),
     prisma.booking.findMany({
