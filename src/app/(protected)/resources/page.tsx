@@ -7,7 +7,7 @@ import { isAdminUser } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 
 type ResourcesPageProps = {
-  searchParams: Promise<{ location?: string; status?: string }>;
+  searchParams: Promise<{ location?: string; operationalStatus?: string }>;
 };
 
 export default async function ResourcesPage({ searchParams }: ResourcesPageProps) {
@@ -19,16 +19,17 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
 
   const params = await searchParams;
   const selectedLocation = params.location ?? "all";
-  const selectedStatus = ["active", "inactive"].includes(params.status ?? "")
-    ? params.status
+  const selectedOperationalStatus = ["AVAILABLE", "IN_MAINTENANCE", "BROKEN"].includes(params.operationalStatus ?? "")
+    ? params.operationalStatus
     : "all";
-  const [allResources, locations, managerAssignment, isAdmin] = await Promise.all([
+  const [allResources, locations, managerAssignments, isAdmin] = await Promise.all([
     prisma.resource.findMany({
       where: {
         space: { isActive: true },
         ...(selectedLocation !== "all" ? { location: selectedLocation } : {}),
-        ...(selectedStatus === "active" ? { isActive: true } : {}),
-        ...(selectedStatus === "inactive" ? { isActive: false } : {}),
+        ...(selectedOperationalStatus !== "all"
+          ? { operationalStatus: selectedOperationalStatus as "AVAILABLE" | "IN_MAINTENANCE" | "BROKEN" }
+          : {}),
       },
       orderBy: [{ location: "asc" }, { name: "asc" }],
     }),
@@ -38,9 +39,9 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
       select: { location: true },
       orderBy: { location: "asc" },
     }),
-    prisma.spaceManager.findFirst({
-      where: { managerId: session.user.id },
-      select: { spaceId: true },
+    prisma.spaceManager.findMany({
+      where: { managerId: session.user.id, space: { isActive: true } },
+      select: { space: { select: { id: true, name: true } } },
     }),
     isAdminUser(session.user.id),
   ]);
@@ -52,7 +53,6 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
     resourcesByLocation.set(resource.location, locationResources);
   }
   const hasAnyResources = locations.length > 0;
-
   return (
     <main className="dashboard-page resources-page">
       <header className="dashboard-header">
@@ -60,7 +60,7 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
         <nav className="resources-navigation" aria-label="Navegação principal">
           <Link href="/dashboard">Painel</Link>
           <Link href="/bookings">Agendamentos</Link>
-          {managerAssignment && <Link href="/review">Analisar solicitações</Link>}
+          {managerAssignments.length > 0 && <Link href="/review">Analisar solicitações</Link>}
           {isAdmin && <Link href="/admin/spaces">Gerenciar espaços</Link>}
           <SignOutButton />
         </nav>
@@ -70,11 +70,18 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
         <div className="resource-catalog-heading">
           <div>
             <p className="eyebrow">Infraestrutura acadêmica</p>
-            <h1 id="resource-heading">Recursos disponíveis</h1>
+            <h1 id="resource-heading">Catálogo de recursos</h1>
           </div>
-          <p className="resource-count" aria-live="polite">
-            {allResources.length} {allResources.length === 1 ? "recurso" : "recursos"}
-          </p>
+          <div className="resource-catalog-actions">
+            <p className="resource-count" aria-live="polite">
+              {allResources.length} {allResources.length === 1 ? "recurso" : "recursos"}
+            </p>
+            {managerAssignments.length > 0 && (
+              <Link className="resource-manage-link" href="/resources/manage">
+                Gerenciar recursos
+              </Link>
+            )}
+          </div>
         </div>
 
         <form className="resource-filters" action="/resources" aria-label="Filtrar recursos">
@@ -87,12 +94,13 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
               ))}
             </select>
           </label>
-          <label htmlFor="resource-status">
-            Status
-            <select id="resource-status" name="status" defaultValue={selectedStatus}>
-              <option value="all">Todos os status</option>
-              <option value="active">Ativos</option>
-              <option value="inactive">Inativos</option>
+          <label htmlFor="resource-operational-status">
+            Condição operacional
+            <select id="resource-operational-status" name="operationalStatus" defaultValue={selectedOperationalStatus}>
+              <option value="all">Todas as condições</option>
+              <option value="AVAILABLE">Disponível</option>
+              <option value="IN_MAINTENANCE">Em manutenção</option>
+              <option value="BROKEN">Quebrado</option>
             </select>
           </label>
           <button type="submit">Aplicar filtros</button>
@@ -107,7 +115,7 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
         ) : allResources.length === 0 ? (
           <div className="resource-empty" role="status">
             <h2>Nenhum recurso encontrado</h2>
-            <p>Altere os filtros para ver recursos de outras localizações ou status.</p>
+            <p>Altere os filtros para ver recursos de outras localizações ou condições operacionais.</p>
           </div>
         ) : (
           <div className="resource-location-groups">
@@ -120,19 +128,33 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
                   </span>
                 </h2>
                 <ul className="resource-grid">
-                  {resources.map((resource) => (
+                  {resources.map((resource) => {
+                    const unavailableForBooking = resource.operationalStatus !== "AVAILABLE";
+                    const statusLabel = resource.operationalStatus === "IN_MAINTENANCE"
+                      ? "Em manutenção"
+                      : resource.operationalStatus === "BROKEN"
+                        ? "Quebrado"
+                        : "Disponível";
+
+                    return (
                     <li className="resource-item" key={resource.id}>
-                      <article>
+                      <article className={unavailableForBooking ? "is-operationally-unavailable" : ""}>
                         <div className="resource-item-heading">
                           <h3>{resource.name}</h3>
-                          <span className={`resource-status ${resource.isActive ? "is-active" : "is-inactive"}`}>
-                            {resource.isActive ? "Ativo" : "Inativo"}
+                          <span className={`resource-status is-${resource.operationalStatus.toLowerCase().replaceAll("_", "-")}`}>
+                            {statusLabel}
                           </span>
                         </div>
                         <p className="resource-description">{resource.description}</p>
+                        {unavailableForBooking && (
+                          <p className="resource-condition-warning">
+                            Novas reservas bloqueadas enquanto o recurso estiver {resource.operationalStatus === "BROKEN" ? "quebrado" : "em manutenção"}.
+                          </p>
+                        )}
                       </article>
                     </li>
-                  ))}
+                    );
+                  })}
                 </ul>
               </section>
             ))}

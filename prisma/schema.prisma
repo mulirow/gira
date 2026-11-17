@@ -72,18 +72,25 @@ model Verification {
 }
 
 model Resource {
-  id          String    @id @default(cuid())
-  name        String
-  description String
-  location    String
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  bookings    Booking[]
-  space       Space     @relation(fields: [location], references: [name], onDelete: Restrict, onUpdate: Cascade)
+  id                String                    @id @default(cuid())
+  name              String
+  description       String
+  location          String
+  operationalStatus ResourceOperationalStatus @default(AVAILABLE)
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+  bookings          Booking[]
+  space             Space                     @relation(fields: [location], references: [name], onDelete: Restrict, onUpdate: Cascade)
 
-  @@index([isActive, name])
+  @@index([operationalStatus, name])
   @@index([location])
+  @@unique([location, name])
+}
+
+enum ResourceOperationalStatus {
+  AVAILABLE
+  IN_MAINTENANCE
+  BROKEN
 }
 
 model Space {

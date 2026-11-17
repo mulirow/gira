@@ -5,7 +5,12 @@ import { requestBooking } from "./actions";
 import ResourceAvailabilityCalendar from "./resource-availability-calendar";
 
 type BookingRequestFormProps = {
-  resources: { id: string; name: string; location: string; isActive: boolean }[];
+  resources: {
+    id: string;
+    name: string;
+    location: string;
+    operationalStatus: "AVAILABLE" | "IN_MAINTENANCE" | "BROKEN";
+  }[];
 };
 
 function toLocalDateTimeValue(date: Date) {
@@ -31,6 +36,7 @@ export default function BookingRequestForm({ resources }: BookingRequestFormProp
   const locations = [...new Set(resources.map((resource) => resource.location))];
   const locationResources = resources.filter((resource) => resource.location === selectedLocation);
   const selectedResource = locationResources.find((resource) => resource.id === selectedResourceId);
+  const isSelectedResourceAvailable = selectedResource?.operationalStatus === "AVAILABLE";
   const minimumEnd = startLocal
     ? toLocalDateTimeValue(new Date(new Date(startLocal).getTime() + 60_000))
     : minimumStart;
@@ -68,13 +74,21 @@ export default function BookingRequestForm({ resources }: BookingRequestFormProp
             {selectedLocation ? "Selecione um recurso" : "Selecione um local primeiro"}
           </option>
           {locationResources.map((resource) => (
-            <option key={resource.id} value={resource.id} disabled={!resource.isActive}>
-              {resource.name}{resource.isActive ? "" : " — Inativo"}
+            <option
+              key={resource.id}
+              value={resource.id}
+              disabled={resource.operationalStatus !== "AVAILABLE"}
+            >
+              {resource.name}{resource.operationalStatus === "IN_MAINTENANCE"
+                ? " — Em manutenção"
+                : resource.operationalStatus === "BROKEN"
+                  ? " — Quebrado"
+                  : ""}
             </option>
           ))}
         </select>
       </label>
-      {selectedResource?.isActive && (
+      {isSelectedResourceAvailable && (
         <ResourceAvailabilityCalendar key={selectedResource.id} resourceId={selectedResource.id} />
       )}
       <div className="booking-time-fields">
@@ -103,7 +117,7 @@ export default function BookingRequestForm({ resources }: BookingRequestFormProp
           <input type="hidden" name="endsAt" value={toUtcValue(endLocal)} />
         </label>
       </div>
-      <button type="submit" disabled={!selectedResource?.isActive}>
+      <button type="submit" disabled={!isSelectedResourceAvailable}>
         Enviar solicitação
       </button>
     </form>
