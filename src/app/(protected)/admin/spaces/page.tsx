@@ -6,6 +6,7 @@ import {
   archiveSpace,
   assignSpaceManager,
   createSpace,
+  deleteSpace,
   restoreSpace,
   revokeSpaceManager,
   updateSpace,
@@ -18,11 +19,13 @@ type AdminSpacesPageProps = {
 const feedback: Record<string, string> = {
   created: "Espaço criado.",
   updated: "Espaço atualizado.",
-  archived: "Espaço excluído do catálogo e arquivado. O histórico foi preservado.",
+  archived: "Espaço arquivado. O histórico foi preservado.",
   restored: "Espaço restaurado.",
+  deleted: "Espaço e recursos sem reservas excluídos.",
   "manager-assigned": "Gerente atribuído ao espaço.",
   "manager-revoked": "Acesso de gerente removido para este espaço.",
-  "has-bookings": "O espaço não pode ser excluído enquanto houver solicitações pendentes ou reservas em andamento ou futuras.",
+  "has-bookings": "O espaço não pode ser arquivado enquanto houver solicitações pendentes ou reservas em andamento ou futuras.",
+  "space-has-bookings": "Este espaço não pode ser excluído porque seus recursos possuem histórico de reservas. Arquive-o para preservar os registros.",
   "invalid-name": "O nome deve ter entre 2 e 100 caracteres.",
   "name-taken": "Já existe um espaço com esse nome.",
   unavailable: "A alteração não pôde ser concluída. Atualize a página e tente novamente.",
@@ -81,7 +84,7 @@ export default async function AdminSpacesPage({ searchParams }: AdminSpacesPageP
         </div>
 
         {params.result && feedback[params.result] && (
-          <p className={`admin-feedback ${params.result === "has-bookings" || params.result === "invalid-name" || params.result === "name-taken" || params.result === "unavailable" ? "is-error" : "is-success"}`} role="status">
+          <p className={`admin-feedback ${params.result === "has-bookings" || params.result === "space-has-bookings" || params.result === "invalid-name" || params.result === "name-taken" || params.result === "unavailable" ? "is-error" : "is-success"}`} role="status">
             {feedback[params.result]}
           </p>
         )}
@@ -129,76 +132,74 @@ export default async function AdminSpacesPage({ searchParams }: AdminSpacesPageP
 
               {selectedSpace.isActive ? (
                 <>
-                  <form className="admin-edit-space" action={updateSpace}>
-                    <input type="hidden" name="spaceId" value={selectedSpace.id} />
-                    <label htmlFor="edit-space-name">Nome do espaço</label>
-                    <div>
-                      <input id="edit-space-name" name="name" defaultValue={selectedSpace.name} maxLength={100} required />
-                      <button type="submit">Salvar</button>
-                    </div>
-                  </form>
+              <form className="admin-edit-space" action={updateSpace}>
+                <input type="hidden" name="spaceId" value={selectedSpace.id} />
+                <label htmlFor="edit-space-name">Nome do espaço</label>
+                <div>
+                  <input id="edit-space-name" name="name" defaultValue={selectedSpace.name} maxLength={100} required />
+                  <button type="submit">Salvar</button>
+                </div>
+              </form>
 
-                  <section className="admin-manager-section" aria-labelledby="manager-list-heading">
-                    <div className="admin-section-heading">
-                      <h3 id="manager-list-heading">Gerentes deste espaço</h3>
-                      <span>{selectedSpace.managerAssignments.length}</span>
-                    </div>
-                    {selectedSpace.managerAssignments.length === 0 ? (
-                      <p className="admin-empty">Nenhum gerente atribuído.</p>
-                    ) : (
-                      <ul className="admin-manager-list">
-                        {selectedSpace.managerAssignments.map(({ manager }) => (
-                          <li key={manager.id}>
-                            <div><strong>{manager.name}</strong><span>{manager.email}</span></div>
-                            <form action={revokeSpaceManager}>
-                              <input type="hidden" name="spaceId" value={selectedSpace.id} />
-                              <input type="hidden" name="managerId" value={manager.id} />
-                              <button type="submit" aria-label={`Remover ${manager.name} deste espaço`}>Remover</button>
-                            </form>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </section>
-
-                  <section className="admin-manager-search" aria-labelledby="manager-search-heading">
-                    <h3 id="manager-search-heading">Atribuir gerente</h3>
-                    <form action="/admin/spaces" className="admin-search-form">
-                      <input type="hidden" name="spaceId" value={selectedSpace.id} />
-                      <label htmlFor="user-search">Buscar usuário por nome ou e-mail</label>
-                      <div>
-                        <input id="user-search" name="q" type="search" defaultValue={query} minLength={2} />
-                        <button type="submit">Buscar</button>
-                      </div>
-                    </form>
-                    {query.length >= 2 && (
-                      candidates.length === 0 ? (
-                        <p className="admin-empty">Nenhum usuário disponível encontrado.</p>
-                      ) : (
-                        <ul className="admin-candidate-list">
-                          {candidates.map((user) => (
-                            <li key={user.id}>
-                              <div><strong>{user.name}</strong><span>{user.email}</span></div>
-                              <form action={assignSpaceManager}>
-                                <input type="hidden" name="spaceId" value={selectedSpace.id} />
-                                <input type="hidden" name="managerId" value={user.id} />
-                                <button type="submit" aria-label={`Atribuir ${user.name} como gerente`}>Atribuir</button>
-                              </form>
-                            </li>
-                          ))}
-                        </ul>
-                      )
-                    )}
-                  </section>
-
-                  <details className="admin-archive-space">
-                    <summary>Excluir espaço</summary>
-                    <p>O espaço será arquivado. O histórico de reservas será mantido; espaços com solicitações pendentes ou reservas em andamento ou futuras não podem ser excluídos.</p>
-                    <form action={archiveSpace}>
-                      <input type="hidden" name="spaceId" value={selectedSpace.id} />
-                      <button type="submit">Confirmar exclusão</button>
-                    </form>
-                  </details>
+              <section className="admin-manager-section" aria-labelledby="manager-list-heading">
+                <div className="admin-section-heading">
+                  <h3 id="manager-list-heading">Gerentes deste espaço</h3>
+                  <span>{selectedSpace.managerAssignments.length}</span>
+                </div>
+                {selectedSpace.managerAssignments.length === 0 ? (
+                  <p className="admin-empty">Nenhum gerente atribuído.</p>
+                ) : (
+                  <ul className="admin-manager-list">
+                    {selectedSpace.managerAssignments.map(({ manager }) => (
+                      <li key={manager.id}>
+                        <div><strong>{manager.name}</strong><span>{manager.email}</span></div>
+                        <form action={revokeSpaceManager}>
+                          <input type="hidden" name="spaceId" value={selectedSpace.id} />
+                          <input type="hidden" name="managerId" value={manager.id} />
+                          <button type="submit" aria-label={`Remover ${manager.name} deste espaço`}>Remover</button>
+                        </form>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+              <section className="admin-manager-search" aria-labelledby="manager-search-heading">
+                <h3 id="manager-search-heading">Atribuir gerente</h3>
+                <form action="/admin/spaces" className="admin-search-form">
+                  <input type="hidden" name="spaceId" value={selectedSpace.id} />
+                  <label htmlFor="user-search">Buscar usuário por nome ou e-mail</label>
+                  <div>
+                    <input id="user-search" name="q" type="search" defaultValue={query} minLength={2} />
+                    <button type="submit">Buscar</button>
+                  </div>
+                </form>
+                {query.length >= 2 && (
+                  candidates.length === 0 ? (
+                    <p className="admin-empty">Nenhum usuário disponível encontrado.</p>
+                  ) : (
+                    <ul className="admin-candidate-list">
+                      {candidates.map((user) => (
+                        <li key={user.id}>
+                          <div><strong>{user.name}</strong><span>{user.email}</span></div>
+                          <form action={assignSpaceManager}>
+                            <input type="hidden" name="spaceId" value={selectedSpace.id} />
+                            <input type="hidden" name="managerId" value={user.id} />
+                            <button type="submit" aria-label={`Atribuir ${user.name} como gerente`}>Atribuir</button>
+                          </form>
+                        </li>
+                      ))}
+                    </ul>
+                  )
+                )}
+              </section>
+              <details className="admin-archive-space">
+                <summary>Arquivar espaço</summary>
+                <p>O espaço ficará fora do catálogo de reservas. O histórico será mantido; não é possível arquivar enquanto houver solicitações pendentes ou reservas futuras.</p>
+                <form action={archiveSpace}>
+                  <input type="hidden" name="spaceId" value={selectedSpace.id} />
+                  <button type="submit">Confirmar arquivamento</button>
+                </form>
+              </details>
                 </>
               ) : (
                 <form action={restoreSpace}>
@@ -206,6 +207,14 @@ export default async function AdminSpacesPage({ searchParams }: AdminSpacesPageP
                   <button className="admin-restore-button" type="submit">Restaurar espaço</button>
                 </form>
               )}
+              <details className="admin-delete-space">
+                <summary>Excluir espaço permanentemente</summary>
+                <p>O espaço e seus recursos serão excluídos permanentemente. A exclusão só é permitida quando nenhum recurso do espaço tem histórico de reservas. Para manter o histórico, use arquivamento.</p>
+                <form action={deleteSpace}>
+                  <input type="hidden" name="spaceId" value={selectedSpace.id} />
+                  <button type="submit">Confirmar exclusão permanente</button>
+                </form>
+              </details>
             </section>
           ) : (
             <div className="resource-empty" role="status">

@@ -20,6 +20,10 @@ function isUniqueConstraintError(error: unknown) {
   return typeof error === "object" && error !== null && "code" in error && error.code === "P2002";
 }
 
+function isForeignKeyConstraintError(error: unknown) {
+  return typeof error === "object" && error !== null && "code" in error && error.code === "P2003";
+}
+
 export async function createSpace(formData: FormData) {
   await requireAdmin();
   const name = formString(formData, "name");
@@ -141,4 +145,43 @@ export async function restoreSpace(formData: FormData) {
   revalidatePath("/resources");
   revalidatePath("/bookings");
   redirect(resultUrl(result.count === 1 ? "restored" : "unavailable", spaceId));
+}
+
+export async function deleteSpace(formData: FormData) {
+  await requireAdmin();
+  const spaceId = formString(formData, "spaceId");
+  if (!spaceId) redirect(resultUrl("unavailable"));
+
+  try {
+    const result = await prisma.$transaction(async (transaction) => {
+      const space = await transaction.space.findUnique({
+        where: { id: spaceId },
+        select: { id: true },
+      });
+      if (!space) return "unavailable";
+
+      const booking = await transaction.booking.findFirst({
+        where: { resource: { space: { id: spaceId } } },
+        select: { id: true },
+      });
+      if (booking) return "has-bookings";
+
+      await transaction.resource.deleteMany({ where: { space: { id: spaceId } } });
+      await transaction.space.delete({ where: { id: spaceId } });
+      return "deleted";
+    });
+
+    if (result !== "deleted") {
+      redirect(resultUrl(result === "has-bookings" ? "space-has-bookings" : "unavailable", spaceId));
+    }
+  } catch (error) {
+    if (isForeignKeyConstraintError(error)) redirect(resultUrl("space-has-bookings", spaceId));
+    throw error;
+  }
+
+  revalidatePath("/admin/spaces");
+  revalidatePath("/resources");
+  revalidatePath("/resources/manage");
+  revalidatePath("/bookings");
+  redirect(resultUrl("deleted", spaceId));
 }
